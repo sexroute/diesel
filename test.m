@@ -19,13 +19,19 @@ for i = start : 1 : endt
     lstrTempFileName = listing(i+3).name;
     lstrFilaName = sprintf('./data/%s/%s',chann,lstrTempFileName);
     a= importdata(lstrFilaName);
+    wave(lnPointCount+1,:)= a(1:1800);
     max_i=max(a);
     if(v_max<max_i)
         v_max = max_i;
         n_max = i;
     end
     min_i = min(a);
-    a=a/(max_i-min_i);
+    %a=a/(max_i-min_i);
+    b= fft(a);
+    b= b(1:ceil(length(b)/2));
+    a= abs(b).^2/length(a);
+    %plot(a);
+    %break;
     if(i>start)
         if(length(a)> length(input(i-1,:)) )
             a = a(1:length(input(i-1,:)));            
@@ -36,7 +42,7 @@ for i = start : 1 : endt
     end
     input(i,:)= a;
     z = input(i,:);
-    input_filttered(i,:) = sgolayfilt(z(1:1900),m,n);
+    input_filttered(i,:) = sgolayfilt(z,m,n);
     if(i>start)
         ldblData2 = alike(input_filttered(i-1,:),input_filttered(i,:));
         ldblData1  = alike(input(i-1,:),input(i,:));
@@ -64,7 +70,7 @@ plot(tmid(result(x,3),:));
 subplot(4,1,3);
 plot(tmid(result(x-1,3),:));
 subplot(4,1,4);
-plot(result(:,1:2));
+plot(wave(result(x-1,3),:));
 a = result;
 b = listing;
 
